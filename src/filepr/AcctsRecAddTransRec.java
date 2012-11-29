@@ -1,6 +1,5 @@
 package filepr;
 
-
 /** An instance of this class represents an Add transaction intended to 
 **  describe an instance of AcctsRecMastRec that is to be created.
 **
@@ -21,10 +20,10 @@ public class AcctsRecAddTransRec extends AcctsRecTransRec {
    **  @return the master record that is to be added
    */
    public AcctsRecMastRec formMasterRec() {
-	return null;
-
-      /***  body missing  ***/
-
+	
+	AcctsRecMastRec Casper = new AcctsRecMastRec(this.getMastKey());
+	return Casper;
+   
    }
 
    public String toString() {

@@ -39,50 +39,68 @@ public class BalancedLine {
 
 	throws Exception {
 
-		AcctsRecMastRec mastRec = mastFile.get(); // Read first master record
-		AcctsRecTransRec transRec = transFile.get(); // Read first transaction
-		Boolean mastRec_Empty = false;
+		AcctsRecMastRec mastRec = mastFile.get(); // Read first master record MR := MF.get();
+		AcctsRecTransRec transRec = transFile.get(); // Read first transaction TR := TF.get();
+		Boolean mastRec_Empty = false;//MR_Empty := false;
+		String LesserKey;// Using this method is another route, but found it more difficult then checking the way implimented. 
 
-		//While we have a master record or a transaction record
+		// While we have a master record or a transaction record
 		while (mastRec != null || transRec != null) {
 
-			// Compare the keys of master record and trans record and see if the
-			// master record's key is bigger
-			if (this.compareMastRecWithTransRec(mastRec, transRec, comp) > 0) {
-				// Ensure the next get call will return the same master record
-				mastFile.unGet();
-				// Set the master record empty flag to true
-				mastRec_Empty = true;
-				// mastRec.setKey(transRec.getMastKey())
+			if (this.compareMastRecWithTransRec(mastRec, transRec, comp) > 0) {// if MR.key() > TR.fKey() then
+				/*
+				 * LesserKey = transRec.getMastKey(); } else{ LesserKey =
+				 * mastRec.getKey();
+				 */
+				// Compare the keys of master record and trans record and see if
+				// the
+				// master record's key is bigger
+				// while (mastRec.getKey() != null && LesserKey != null)
+				mastFile.unGet();// MF.unGet();
+				mastRec_Empty = true;// MR_Empty := true;
+				mastRec = new AcctsRecMastRec(transRec.getMastKey());// MR.setKey(TR.fKey());
 			}
 
-			// While the transaction record matches our master record
-			while (this.compareMastRecWithTransRec(mastRec, transRec, comp) == 0) {
-				// Apply the transaction
-				System.out.println(transRec.toString());
+			while (compareMastRecWithTransRec(mastRec, transRec, comp) == 0) {// do while MR.key() =  TR.fKey()
+				if (transRec instanceof AcctsRecAddTransRec) {// if the instance of is Add (A) we do this
+					if (mastRec_Empty) {
+						mastRec = ((AcctsRecAddTransRec) transRec)
+								.formMasterRec();// Apply_Transaction();
+						mastRec_Empty = false;
+					} else {
+						System.out.println("See this Error [Error1] once or you made a mistake");
+					}
+				}
+				if (transRec instanceof AcctsRecChangeTransRec) {// if the instance of is Change (C) we do this
+					if (mastRec_Empty) {
+						System.out.println("See this Error [Error2] once or you made a mistake");
+					} else {
+						((AcctsRecChangeTransRec) transRec)
+								.applyChange(mastRec);// Apply_Transaction();
+					}
+				}
+				if (transRec instanceof AcctsRecDeleteTransRec) {// if the instance of is Delete (D) we do this
+					if (mastRec_Empty) {
+						System.out.println("See this Error [Error3] once or you made a mistake");
+					} else {
+						mastRec_Empty = true; // Apply_Transaction();
+					}
+				}
 
-				// Get the next transaction
-				transRec = transFile.get();
+				transRec = transFile.get();// TR := TF.get();
+
 			}
 
-			// Ensure that the master key is greater than the transaction record
-			// key
-			if (this.compareMastRecWithTransRec(mastRec, transRec, comp) > 0)
-				throw new RuntimeException(
-						"The master record's key must be greater than the transaction record's key. Algorithm terminated.");
+			if (mastRec_Empty) {// if MR_Empty
 
-			// If the master record empty flag is true
-			if (mastRec_Empty) {
-				// Put the master record in our new master record file
-				newMastFile.put(mastRec);
+			} else {
+				newMastFile.put(mastRec);// else NMF.put(MR);
 			}
+			mastRec = mastFile.get();// MR := MF.get();
+			mastRec_Empty = false;// MR_Empty := false;
 
-			// Get the next master record
-			mastRec = mastFile.get();
-
-			// Reset the master record empty flag
-			mastRec_Empty = false;
 		}
+		System.out.println("You can't find me! Go check the newMaster!");//Test to find. Also marks the END!
 
 		// Close open files
 		newMastFile.close();

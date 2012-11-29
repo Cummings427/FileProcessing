@@ -24,7 +24,7 @@ public class AcctsRecSFUApp {
    **   --a file in which error transactions are to be reported.
    */
    public static void main(String[] args) throws Exception {
-	   
+
       AcctsRecMasterInputFile mastFile =        // old master file
          new AcctsRecMasterInputFile(args[0]);
       AcctsRecTransInputFile transFile =        // transaction file

@@ -24,7 +24,8 @@ public class AcctsRecChangeTransRec extends AcctsRecTransRec {
    */
    public void applyChange(AcctsRecMastRec mr) {
 
-      /****  body missing   ****/
+	mr.setBalance(mr.getBalance() + deltaBalance);
+	   
    }
 
    public String toString() {

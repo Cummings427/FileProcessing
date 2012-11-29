@@ -17,12 +17,16 @@ import java.util.NoSuchElementException;
 public class AcctsRecMasterInputFile {
 
    private Scanner sc;  // for reading from the provided file
-
+   private AcctsRecMastRec Ghost;//The "Ghost" will disappear after unGet
+   private AcctsRecMastRec temp;
+   
    /** Prepares the object to read data from the file with the specified
    **  name.
    */
    public AcctsRecMasterInputFile(String fileName) throws FileNotFoundException 
-      { sc = new Scanner(new File(fileName)); }
+      { sc = new Scanner(new File(fileName)); 
+      Ghost = null;
+      temp = null; }
 
 
    /** Returns the next master record in the file (unless there is none,
@@ -32,18 +36,26 @@ public class AcctsRecMasterInputFile {
    public AcctsRecMastRec get() throws Exception {
 
       AcctsRecMastRec result;
-
-      try {
-         String name = sc.next();
-         int balance = sc.nextInt();
-         result = new AcctsRecMastRec(name, balance);
+      if(Ghost != null){
+    	  result = Ghost;
+    	  Ghost = null;
+  	  }
+      else
+      {
+    	   try {
+    	    	
+    	         String name = sc.next();
+    	         int balance = sc.nextInt();
+    	         result = new AcctsRecMastRec(name, balance);
+    	      }
+    	      catch (NoSuchElementException e) { 
+    	         result = null;
+    	      }
+    	      catch (Exception e) {
+    	         throw e;
+    	      }
       }
-      catch (NoSuchElementException e) { 
-         result = null;
-      }
-      catch (Exception e) {
-         throw e;
-      }
+      temp = result;
       return result;
    }
 
@@ -54,9 +66,7 @@ public class AcctsRecMasterInputFile {
    **  response to the first call.
    */
    public void unGet() { 
-
-      /***  missing body  ***/
-
+	   Ghost = temp;
    }
 
 }
